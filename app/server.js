@@ -1,13 +1,14 @@
 import express from 'express';
 import path from 'path';
+const cors = require('cors');
 const app = express();
 
 import * as database from './database';
 import * as urls from './urls';
+import * as config from './config';
 
 app.use(express.static( __dirname + "/static"));
-
-const PORT = 3001;
+app.use(cors());
 
 /*
 Standard error codes:
@@ -20,8 +21,9 @@ Standard error codes:
  Mine:
  Not enough params - 401
  Param is incorrect - 402
- Room already registered - 400
- Error on inserting room - 500
+ Basic user error - 400
+ Insufficient Permissions - 450
+ Basic server error - 500
 */
 
 const createRes = (boolSuccess, data, error, errorCode) => {
@@ -47,21 +49,67 @@ app.get("/test", (req, res) => {
   res.send(createRes(true, {data: 'Yep, that worked'}))
 });
 
-app.get(urls.addRoom, (req, res) => {
+app.get(urls.addRoom, async function(req, res){
   const params = req.params;
   const numOnlyReg = /^\d+$/;
   if(Object.keys(params).length < 3){
     res.send(createRes(false, {}, "Not enough parameters", 401))
-  }else if(!numOnlyReg.test(params.totalPasses)){
-    res.send(createRes(false, {}, "Total rooms is not a number", 402))
+  }else if(!numOnlyReg.test(params.totalPasses) || params.totalPasses < 1){
+    res.send(createRes(false, {}, "Invalid total room number", 402))
   } else{
-    database.addRoom(params.creatorId, params.roomId, params.totalPasses)
-      .then((result) => {
-        res.send(result);
-      })
+    let result = await database.addRoom(params.creatorId, params.roomId, params.totalPasses)
+    res.send(result);
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Running on port ${PORT}`);
+app.get(urls.getUser, async function(req, res){
+  const params = req.params;
+  let result = await database.getUser(params.userId);
+  res.send(result);
+});
+
+app.get(urls.getRoom, async function(req, res){
+  const params = req.params;
+  let result = await database.getRoom(params.roomId);
+  res.send(result);
+});
+
+app.get(urls.searchName, async function(req, res){
+  const params = req.params;
+  let result = await database.searchForName(params.name);
+  res.send(result);
+});
+
+app.get(urls.addUser, async function(req, res){
+  const params = req.params;
+  let result = await database.addUser(params.userId, params.userName, params.userRank, params.email);
+  res.send(result);
+});
+
+app.get(urls.usePass, async function(req, res){
+  const params = req.params;
+  let result = await database.usePass(params.userId, params.roomId);
+  res.send(result);
+});
+
+app.get(urls.testUpdate, async function(req, res){
+  const params = req.params;
+  let result = await database.updateNumOut(params.roomId);
+  res.send("Done");
+});
+
+app.get(urls.passInfo, async function(req, res){
+  const params = req.params;
+  let result = await database.getPassInfo(params.userId);
+  res.send(result);
+});
+
+app.get(urls.passInfoName, async function(req, res){
+  const params = req.params;
+  let result = await database.getPassInfoName(params.userName);
+  res.send(result);
+});
+
+app.listen(config.PORT, () => {
+  console.log(`Running on port ${config.PORT}`);
 });
