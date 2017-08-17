@@ -4,15 +4,18 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon app/server.js --exec babel-node",
+    "startDev": "nodemon app/server.js --exec babel-node",
     "build": "babel app -d dist",
-    "serve": "node dist/server.js"
+    "serve": "node dist/server.js",
+    "start": "npm run build && npm run serve"
   },
   "author": "Aidan Dempster <aidan.dempster@gmail.com>",
   "license": "ISC",
   "devDependencies": {
     "babel-cli": "^6.24.1",
     "babel-core": "^6.25.0",
+    "babel-plugin-transform-async-to-generator": "^6.24.1",
+    "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-latest": "^6.24.1",
     "nodemon": "^1.11.0"
   },
