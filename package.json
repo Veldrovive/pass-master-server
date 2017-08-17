@@ -7,7 +7,7 @@
     "startDev": "nodemon app/server.js --exec babel-node",
     "build": "babel app -d dist",
     "serve": "node dist/server.js",
-    "start": "npm run build && npm run serve"
+    "start": "npm run serve"
   },
   "author": "Aidan Dempster <aidan.dempster@gmail.com>",
   "license": "ISC",
