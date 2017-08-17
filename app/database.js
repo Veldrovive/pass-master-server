@@ -30,7 +30,51 @@ const createRes = (boolSuccess, data, error, errorCode) => {
 connection.connect((err) => {
   if(err) throw err;
   console.log("Connection established to database");
+  onConnect();
 });
+
+function onConnect(){
+  connection.query("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE'", (err, res) => {
+    if(err){
+      console.log("Error getting table names");
+    }else{
+      let tableArray = [];
+      res.forEach((table) => {
+        tableArray.push(table.TABLE_NAME);
+      });
+      if(tableArray.indexOf('rooms') === -1){
+        console.log("Create Rooms");
+        connection.query(options.databaseCommands.createRoomsTable, (err, res) => {
+          if(err){
+            console.log("Could not create table: ",err)
+          }else{
+            console.log("Created Table: rooms");
+          }
+        })
+      }
+      if(tableArray.indexOf('users') === -1){
+        console.log("Create Users");
+        connection.query(options.databaseCommands.createUserTable, (err, res) => {
+          if(err){
+            console.log("Could not create table: ",err)
+          }else{
+            console.log("Created Table: users");
+          }
+        })
+      }
+      if(tableArray.indexOf('userTimes') === -1){
+        console.log("Create UserTimes");
+        connection.query(options.databaseCommands.createTimeTable, (err, res) => {
+          if(err){
+            console.log("Could not create table: ",err)
+          }else{
+            console.log("Created Table: userTimes");
+          }
+        })
+      }
+    }
+  })
+}
 
 export async function getNumOut(roomId){
   return new Promise(resolve => {
@@ -186,6 +230,7 @@ export async function usePass(userId, roomId){
                         .then((updatedUsers) => {
                           resolve(createRes(true, {
                             msg: "User signed in",
+                            newState: false,
                             time: seconds,
                             user: userId,
                             room: roomId,
@@ -223,9 +268,9 @@ export async function usePass(userId, roomId){
                 } else {
                   updateNumOut(roomId)
                     .then((updatedUsers) => {
-                      console.log("Total users: "+totalUsers+", and updated users: "+updatedUsers);
                       resolve(createRes(true, {
                         msg: "User signed out",
+                        newState: true,
                         time: seconds,
                         user: userId,
                         room: roomId,
