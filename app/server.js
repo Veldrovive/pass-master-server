@@ -80,9 +80,21 @@ app.get(urls.searchName, async function(req, res){
   res.send(result);
 });
 
+app.get(urls.searchNameList, async function(req, res){
+  const params = req.params;
+  let result = await database.getUsersStartWith(params.name);
+  res.send(result);
+});
+
 app.get(urls.addUser, async function(req, res){
   const params = req.params;
   let result = await database.addUser(params.userId, params.userName, params.userRank, params.email);
+  res.send(result);
+});
+
+app.get(urls.assignRank, async function(req, res){
+  const params = req.params;
+  let result = await database.assignRank(params.userId, params.rank);
   res.send(result);
 });
 

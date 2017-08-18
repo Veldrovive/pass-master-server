@@ -95,6 +95,33 @@ function onConnect(){
   })
 }
 
+export async function getUsersStartWith(start){
+  return new Promise(resolve => {
+    connection.query("SELECT userName FROM users WHERE userName REGEXP $1 OR userName LIKE $2", ["[[:space:]]+"+start, start+"%"], (err, res) => {
+      if(err){
+        console.log(err);
+        resolve(createRes(false, {}, "Could not get users", 500));
+      }else{
+        res = res.rows;
+        resolve(createRes(true, {res}));
+      }
+    })
+  })
+}
+
+export async function assignRank(userId, userRank){
+  return new Promise(resolve => {
+    connection.query("UPDATE users SET userRank=$1 WHERE googleId=$2", [userRank, userId], (err, res) => {
+      if(err){
+        console.log(err);
+        resolve(createRes(false, {}, "Could not update user rank", 500))
+      }else{
+        resolve(createRes(true, {userId: userId, newRank: userRank}));
+      }
+    })
+  })
+}
+
 export async function getNumOut(roomId){
   return new Promise(resolve => {
     connection.query('SELECT COUNT(CASE WHEN roomId=$1 AND timeIn=0 THEN 1 END) AS count FROM userTimes', [roomId], (err, res) => {
