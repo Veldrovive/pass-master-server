@@ -52,12 +52,12 @@ app.get("/test", (req, res) => {
 app.get(urls.addRoom, async function(req, res){
   const params = req.params;
   const numOnlyReg = /^\d+$/;
-  if(Object.keys(params).length < 3){
+  if(Object.keys(params).length < 4){
     res.send(createRes(false, {}, "Not enough parameters", 401))
   }else if(!numOnlyReg.test(params.totalPasses) || params.totalPasses < 1){
     res.send(createRes(false, {}, "Invalid total room number", 402))
   } else{
-    let result = await database.addRoom(params.creatorId, params.roomId, params.totalPasses)
+    let result = await database.addRoom(params.creatorId, params.roomId, params.totalPasses, params.roomName);
     res.send(result);
   }
 });

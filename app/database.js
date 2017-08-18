@@ -179,11 +179,11 @@ export async function getRoom(roomId){
       } else {
         res = res.rows;
         if (res.length > 1) {
-          resolve(createRes(true, {id: res[0].roomid, passTotal: res[0].passtotal, currentUsers: res[0].currentusers, creatorId:res[0].creatorid}, "Warning: More than one room has this ID", 500));
+          resolve(createRes(true, {id: res[0].roomid, passTotal: res[0].passtotal, currentUsers: res[0].currentusers, creatorId:res[0].creatorid, name: res[0].roomname}, "Warning: More than one room has this ID", 500));
         }else if(res.length == 0){
           resolve(createRes(false, {}, "No room has this ID", 400));
         }else {
-          resolve(createRes(true, {id: res[0].roomid, passTotal: res[0].passtotal, currentUsers: res[0].currentusers, creatorId:res[0].creatorid}));
+          resolve(createRes(true, {id: res[0].roomid, passTotal: res[0].passtotal, currentUsers: res[0].currentusers, creatorId:res[0].creatorid, name: res[0].roomname}));
         }
       }
     })
@@ -227,7 +227,7 @@ export async function addUser(id, name, rank, email){
   })
 }
 
-export async function addRoom(creatorId, roomId, totalPasses){
+export async function addRoom(creatorId, roomId, totalPasses, roomName){
   return new Promise(resolve => {
     connection.query('SELECT * FROM users WHERE googleId = $1', [creatorId], (err, res) => {
       res = res.rows || [];
@@ -246,7 +246,7 @@ export async function addRoom(creatorId, roomId, totalPasses){
           }else if(res.length > 0){
             resolve(createRes(false, {}, "Room already registered", 400));
           }else{
-            connection.query('INSERT INTO rooms (roomId, passTotal, currentUsers, creatorId) VALUES ($1, $2, 0, $3)', [roomId, totalPasses, creatorId], (err, res) => {
+            connection.query('INSERT INTO rooms (roomId, passTotal, currentUsers, creatorId, roomName) VALUES ($1, $2, 0, $3, $4)', [roomId, totalPasses, creatorId, roomName], (err, res) => {
               if(err){
                 resolve(createRes(false, {}, "Error on inserting room", 500));
               }else{
