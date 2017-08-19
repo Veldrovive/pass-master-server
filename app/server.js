@@ -122,6 +122,30 @@ app.get(urls.passInfoName, async function(req, res){
   res.send(result);
 });
 
+app.get(urls.getActivityToday, async function(req, res){
+  const params = req.params;
+  let result = await database.getTodayActivity(params.userId);
+  res.send(result);
+});
+
+app.get(urls.getPassActivityToday, async function(req, res){
+  const params = req.params;
+  let result = await database.getTodayPassActivity(params.roomId);
+  res.send(result);
+});
+
+app.get(urls.getActivityForDate, async function(req, res){
+  const params = req.params;
+  let result = await database.getActivityForDate(params.userId, params.day, params.month, params.year);
+  res.send(result);
+});
+
+app.get(urls.getPassActivityForDate, async function(req, res){
+  const params = req.params;
+  let result = await database.getPassActivityForDate(params.roomId, params.day, params.month, params.year);
+  res.send(result);
+});
+
 import passport from 'passport';
 import GoogleStrategy from 'passport-google-oauth20';
 

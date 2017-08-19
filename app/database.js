@@ -401,3 +401,175 @@ export async function getPassInfoName(userName){
     });
   });
 }
+
+export async function getTodayActivity(id){
+  async function getInfo(userId){
+    let start = new Date();
+    start.setHours(0, 0, 0, 0);
+    let end = new Date();
+    end.setHours(23, 59, 59, 0);
+
+    return new Promise(resolve => {
+      connection.query('SELECT * FROM userTimes WHERE timeOut BETWEEN $1 AND $2 AND timeUserId = $3', [start.getTime()/1000, end.getTime()/1000, userId], (err, res) => {
+        if(err){
+          resolve(false);
+        }else{
+          res = res.rows;
+          resolve(res);
+        }
+      })
+    })
+  }
+
+  const info = await getInfo(id);
+  return new Promise(resolve => {
+    if(info == false){
+      resolve(createRes(false, {}, "Could not get user info", 500));
+    }else{
+      info.forEach(row => {
+        const timeOut = parseInt(row.timeout);
+        const timeIn = parseInt(row.timein);
+        if(timeIn > 1){
+          row.totalTime = timeIn-timeOut;
+        }else{
+          row.totalTime = 0;
+        }
+      });
+      resolve(createRes(true, {totalUsage: info.length, data: info}))
+    }
+  });
+}
+
+export async function getTodayPassActivity(id){
+  async function getInfo(passId){
+    let start = new Date();
+    start.setHours(0, 0, 0, 0);
+    let end = new Date();
+    end.setHours(23, 59, 59, 0);
+
+    return new Promise(resolve => {
+      connection.query('SELECT * FROM userTimes WHERE timeOut BETWEEN $1 AND $2 AND roomId = $3', [start.getTime()/1000, end.getTime()/1000, passId], (err, res) => {
+        if(err){
+          resolve(false);
+        }else{
+          resolve(res.rows);
+        }
+      })
+    })
+  }
+
+  const info = await getInfo(id);
+  if(info === false){
+    return(createRes(false, {}, "Could not get pass info", 500));
+  }else{
+    info.forEach((row) => {
+      if(parseInt(row.timein) > 1) {
+        row.totalOutTime = (parseInt(row.timein) - parseInt(row.timeout));
+      }else{
+        row.totalOutTime = 0;
+      }
+    });
+    return(createRes(true, {totalUsage: info.length, data: info}));
+  }
+}
+
+export async function getActivityForDate(id, day, month, year){
+  async function getInfo(userId){
+    let start = new Date();
+    start.setHours(0, 0, 0, 0);
+    let end = new Date();
+    end.setHours(23, 59, 59, 0);
+    if(!isNaN(day)){
+      start.setDate(day);
+      end.setDate(day);
+    }
+    if(!isNaN(month)){
+      start.setMonth(month);
+      end.setMonth(month);
+    }
+    if(!isNaN(year)) {
+      if(year < 2000){
+        year += 2000;
+      }
+      start.setYear(year);
+      end.setYear(year);
+    }
+
+    return new Promise(resolve => {
+      connection.query('SELECT * FROM userTimes WHERE timeOut BETWEEN $1 AND $2 AND timeUserId = $3', [start.getTime()/1000, end.getTime()/1000, userId], (err, res) => {
+        if(err){
+          resolve(false);
+        }else{
+          res = res.rows;
+          resolve(res);
+        }
+      })
+    })
+  }
+
+  const info = await getInfo(id);
+  return new Promise(resolve => {
+    if(info == false){
+      resolve(createRes(false, {}, "Could not get user info", 500));
+    }else{
+      info.forEach(row => {
+        const timeOut = parseInt(row.timeout);
+        const timeIn = parseInt(row.timein);
+        if(timeIn > 1){
+          row.totalTime = timeIn-timeOut;
+        }else{
+          row.totalTime = 0;
+        }
+      });
+      resolve(createRes(true, {totalUsage: info.length, data: info}))
+    }
+  });
+}
+
+export async function getPassActivityForDate(id, day, month, year){
+  async function getInfo(passId){
+    let start = new Date();
+    start.setHours(0, 0, 0, 0);
+    let end = new Date();
+    end.setHours(23, 59, 59, 0);
+    if(!isNaN(day)){
+      start.setDate(day);
+      end.setDate(day);
+    }
+    if(!isNaN(month)){
+      start.setMonth(month);
+      end.setMonth(month);
+    }
+    if(!isNaN(year)) {
+      if(year < 2000){
+        year += 2000;
+      }
+      start.setYear(year);
+      end.setYear(year);
+    }
+
+    return new Promise(resolve => {
+      connection.query('SELECT * FROM userTimes WHERE timeOut BETWEEN $1 AND $2 AND roomId = $3', [start.getTime()/1000, end.getTime()/1000, passId], (err, res) => {
+        if(err){
+          resolve(false);
+        }else{
+          resolve(res.rows);
+        }
+      })
+    })
+  }
+
+  const info = await getInfo(id);
+  if(info === false){
+    return(createRes(false, {}, "Could not get pass info", 500));
+  }else{
+    info.forEach((row) => {
+      if(parseInt(row.timein) > 1) {
+        row.totalOutTime = (parseInt(row.timein) - parseInt(row.timeout));
+      }else{
+        row.totalOutTime = 0;
+      }
+    });
+    return(createRes(true, {totalUsage: info.length, data: info}));
+  }
+}
