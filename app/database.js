@@ -440,7 +440,7 @@ export async function getTodayActivity(id){
   });
 }
 
-export async function getTodayPassActivity(id){
+export async function getTodayPassActivity(id, doNames){
   async function getInfo(passId){
     let start = new Date();
     start.setHours(0, 0, 0, 0);
@@ -459,18 +459,32 @@ export async function getTodayPassActivity(id){
   }
 
   const info = await getInfo(id);
-  if(info === false){
-    return(createRes(false, {}, "Could not get pass info", 500));
-  }else{
-    info.forEach((row) => {
-      if(parseInt(row.timein) > 1) {
-        row.totalOutTime = (parseInt(row.timein) - parseInt(row.timeout));
-      }else{
-        row.totalOutTime = 0;
+  return new Promise(resolve => {
+    if(info === false){
+      resolve(createRes(false, {}, "Could not get pass info", 500));
+    }else{
+      let counter = info.length;
+      if(counter == 0){
+        resolve(createRes(true, {totalUsage: info.length, data: info}));
       }
-    });
-    return(createRes(true, {totalUsage: info.length, data: info}));
-  }
+      info.forEach(async row => {
+        if(doNames === "true"){
+          const user = await getUser(row.timeuserid);
+          row.userName = user.res.name;
+        }
+        if(parseInt(row.timein) > 1) {
+          row.totalOutTime = (parseInt(row.timein) - parseInt(row.timeout));
+        }else{
+          row.totalOutTime = 0;
+        }
+        counter--;
+        if(counter == 0){
+          resolve(createRes(true, {totalUsage: info.length, data: info}));
+        }
+      });
+    }
+  })
+
 }
 
 export async function getActivityForDate(id, day, month, year){
@@ -480,14 +494,17 @@ export async function getActivityForDate(id, day, month, year){
     let end = new Date();
     end.setHours(23, 59, 59, 0);
     if(!isNaN(day)){
+      day = parseInt(day);
       start.setDate(day);
       end.setDate(day);
     }
     if(!isNaN(month)){
-      start.setMonth(month);
-      end.setMonth(month);
+      month = parseInt(month);
+      start.setMonth(month-1);
+      end.setMonth(month-1);
     }
     if(!isNaN(year)) {
+      year = parseInt(year);
       if(year < 2000){
         year += 2000;
       }
@@ -526,21 +543,24 @@ export async function getActivityForDate(id, day, month, year){
   });
 }
 
-export async function getPassActivityForDate(id, day, month, year){
+export async function getPassActivityForDate(id, day, month, year, doNames){
   async function getInfo(passId){
     let start = new Date();
     start.setHours(0, 0, 0, 0);
     let end = new Date();
     end.setHours(23, 59, 59, 0);
     if(!isNaN(day)){
+      day = parseInt(day);
       start.setDate(day);
       end.setDate(day);
     }
     if(!isNaN(month)){
-      start.setMonth(month);
-      end.setMonth(month);
+      month = parseInt(month);
+      start.setMonth(month-1);
+      end.setMonth(month-1);
     }
     if(!isNaN(year)) {
+      year = parseInt(year);
       if(year < 2000){
         year += 2000;
       }
@@ -560,16 +580,29 @@ export async function getPassActivityForDate(id, day, month, year){
   }
 
   const info = await getInfo(id);
-  if(info === false){
-    return(createRes(false, {}, "Could not get pass info", 500));
-  }else{
-    info.forEach((row) => {
-      if(parseInt(row.timein) > 1) {
-        row.totalOutTime = (parseInt(row.timein) - parseInt(row.timeout));
-      }else{
-        row.totalOutTime = 0;
+  return new Promise(resolve => {
+    if(info === false){
+      resolve(createRes(false, {}, "Could not get pass info", 500));
+    }else{
+      let counter = info.length;
+      if(counter == 0){
+        resolve(createRes(true, {totalUsage: info.length, data: info}));
       }
-    });
-    return(createRes(true, {totalUsage: info.length, data: info}));
-  }
+      info.forEach(async row => {
+        if(doNames === "true"){
+          const user = await getUser(row.timeuserid);
+          row.userName = user.res.name;
+        }
+        if(parseInt(row.timein) > 1) {
+          row.totalOutTime = (parseInt(row.timein) - parseInt(row.timeout));
+        }else{
+          row.totalOutTime = 0;
+        }
+        counter--;
+        if(counter == 0){
+          resolve(createRes(true, {totalUsage: info.length, data: info}));
+        }
+      });
+    }
+  });
 }

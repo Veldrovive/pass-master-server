@@ -9,8 +9,8 @@ export const usePass = '/usePass/:userId/:roomId';
 export const passInfo = '/passInfo/:userId';
 export const passInfoName = '/passInfoName/:userName';
 export const getActivityToday = '/getActivityToday/:userId';
-export const getPassActivityToday = '/getPassActivityToday/:roomId';
+export const getPassActivityToday = '/getPassActivityToday/:roomId/:doNames?';
 export const getActivityForDate = '/getActivityForDate/:userId/:day?/:month?/:year?';
-export const getPassActivityForDate = '/getPassActivityForDate/:roomId/:day?/:month?/:year?';
+export const getPassActivityForDate = '/getPassActivityForDate/:roomId/:day?/:month?/:year?/:doNames?';
 
 export const testUpdate = '/testUpdate/:roomId';

@@ -130,7 +130,7 @@ app.get(urls.getActivityToday, async function(req, res){
 
 app.get(urls.getPassActivityToday, async function(req, res){
   const params = req.params;
-  let result = await database.getTodayPassActivity(params.roomId);
+  let result = await database.getTodayPassActivity(params.roomId, params.doNames);
   res.send(result);
 });
 
@@ -142,7 +142,7 @@ app.get(urls.getActivityForDate, async function(req, res){
 
 app.get(urls.getPassActivityForDate, async function(req, res){
   const params = req.params;
-  let result = await database.getPassActivityForDate(params.roomId, params.day, params.month, params.year);
+  let result = await database.getPassActivityForDate(params.roomId, params.day, params.month, params.year, params.doNames);
   res.send(result);
 });
 
