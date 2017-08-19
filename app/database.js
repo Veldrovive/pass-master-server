@@ -414,8 +414,7 @@ export async function getTodayActivity(id){
         if(err){
           resolve(false);
         }else{
-          res = res.rows;
-          resolve(res);
+          resolve(res.rows);
         }
       })
     })
@@ -423,7 +422,7 @@ export async function getTodayActivity(id){
 
   const info = await getInfo(id);
   return new Promise(resolve => {
-    if(info == false){
+    if(info === 'false'){
       resolve(createRes(false, {}, "Could not get user info", 500));
     }else{
       info.forEach(row => {
@@ -460,7 +459,7 @@ export async function getTodayPassActivity(id, doNames){
 
   const info = await getInfo(id);
   return new Promise(resolve => {
-    if(info === false){
+    if(info === 'false'){
       resolve(createRes(false, {}, "Could not get pass info", 500));
     }else{
       let counter = info.length;
@@ -526,7 +525,7 @@ export async function getActivityForDate(id, day, month, year){
 
   const info = await getInfo(id);
   return new Promise(resolve => {
-    if(info == false){
+    if(info === 'false'){
       resolve(createRes(false, {}, "Could not get user info", 500));
     }else{
       info.forEach(row => {
@@ -581,7 +580,7 @@ export async function getPassActivityForDate(id, day, month, year, doNames){
 
   const info = await getInfo(id);
   return new Promise(resolve => {
-    if(info === false){
+    if(info === 'false'){
       resolve(createRes(false, {}, "Could not get pass info", 500));
     }else{
       let counter = info.length;
