@@ -1,20 +1,7 @@
-import mysql from 'mysql';
 import { Client } from 'pg';
 import * as options from './config';
 
 const connection = new Client(options.databaseUrl);
-
-process.stdin.resume();
-function onExit() {
-  console.log("Clean Exit");
-  connection.end();
-  process.exit();
-}
-//process.on('exit', onExit);
-//process.on('SIGINT', onExit);
-
-
-mysql.createConnection(options.DATABASE_OPTIONS);
 
 /*
  Standard error codes:
