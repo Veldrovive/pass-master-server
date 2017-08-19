@@ -278,10 +278,11 @@ export async function usePass(userId, roomId){
                 if(err){
                   resolve(createRes(false, {}, "Failed to update userTimes", 500))
                 }else{
-                  connection.query('UPDATE users SET userState = false WHERE googleId = $1', [userId], (err, res) => {
+                  connection.query('UPDATE users SET userState = false WHERE googleId = $1', [userId], async (err, res) => {
                     if(err){
                       resolve(createRes(false, {}, "Failed to update userState", 500))
                     }else{
+                      const room = await getRoom(roomId);
                       updateNumOut(roomId)
                         .then((updatedUsers) => {
                           resolve(createRes(true, {
@@ -290,6 +291,7 @@ export async function usePass(userId, roomId){
                             time: seconds,
                             user: userId,
                             room: roomId,
+                            roomName: room.res.name,
                             remainingPasses: totalUsers-updatedUsers,
                           }))
                         })
@@ -318,10 +320,11 @@ export async function usePass(userId, roomId){
             if (err) {
               resolve(createRes(false, {}, "Could not insert timeOut", 500));
             } else {
-              connection.query('UPDATE users SET userState = true WHERE googleId = $1', [userId], (err, res) => {
+              connection.query('UPDATE users SET userState = true WHERE googleId = $1', [userId], async (err, res) => {
                 if (err) {
                   resolve(createRes(false, {}, "Could not update state of user", 500));
                 } else {
+                  const room = await getRoom(roomId);
                   updateNumOut(roomId)
                     .then((updatedUsers) => {
                       resolve(createRes(true, {
@@ -330,6 +333,7 @@ export async function usePass(userId, roomId){
                         time: seconds,
                         user: userId,
                         room: roomId,
+                        roomName: room.res.name,
                         remainingPasses: totalUsers-updatedUsers,
                       }))
                     })
@@ -383,7 +387,7 @@ export async function getPassInfo(userId){
           const seconds = Math.floor(now.getTime()/1000);
           const totalTime = seconds-res[0].timeout;
 
-          resolve(createRes(true, {pass: true, name: user.res.name, totalTime: totalTime, timeOut: res[0].timeout, room: res[0].roomid, teacher: teacher.res.name, remainingRoomPasses: room.res.passTotal-room.res.currentUsers}))
+          resolve(createRes(true, {pass: true, name: user.res.name, totalTime: totalTime, timeOut: res[0].timeout, roomName: room.res.name, room: res[0].roomid, teacher: teacher.res.name, remainingRoomPasses: room.res.passTotal-room.res.currentUsers}))
         }else{
           resolve(createRes(false, {pass: false, id: userId}, "User does not have a pass", 400))
         }
