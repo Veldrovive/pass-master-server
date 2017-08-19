@@ -147,11 +147,11 @@ export async function getUser(userId){
       } else {
         res = res.rows;
         if (res.length > 1) {
-          resolve(createRes(true, {state: res[0].userstate, name: res[0].username, rank: res[0].userrank, id: userId}, "Warning: More than one user has this ID", 500));
+          resolve(createRes(true, {state: res[0].userstate, name: res[0].username, email: res[0].email, rank: res[0].userrank, id: userId}, "Warning: More than one user has this ID", 500));
         }else if(res.length == 0){
           resolve(createRes(false, {}, "No user has this ID", 400));
         }else {
-          resolve(createRes(true, {state: res[0].userstate, name: res[0].username, rank: res[0].userrank, id: userId}));
+          resolve(createRes(true, {state: res[0].userstate, name: res[0].username, email: res[0].email, rank: res[0].userrank, id: userId}));
         }
       }
     })
